@@ -10,7 +10,7 @@ keys, retries and format differences, and bills one prepaid balance.
 - **API base:** `https://api.pixfaro.com`
 - **MCP endpoint:** `https://mcp.pixfaro.com/mcp`
 - **Agent index:** https://docs.pixfaro.com/llms.txt
-- **MCP server / CLI source:** https://github.com/pixfaro/mcp
+- **MCP server / CLI source:** https://github.com/dariaworks/mcp
 
 ## Quickstart
 
@@ -47,7 +47,7 @@ truth**. The docs.pixfaro.com worker page is generated from them: run
 CI-style if it drifts). Deploys (`npm run deploy`) regenerate automatically.
 
 Found a mistake, or something the docs don't answer? [Open an
-issue](https://github.com/pixfaro/docs/issues) — issues here double as public
+issue](https://github.com/dariaworks/docs/issues) — issues here double as public
 support.
 
 ---

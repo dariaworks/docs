@@ -7,7 +7,7 @@ One MCP connection gives your agent every major image model. Two ways in:
 | **Remote** (streamable HTTP + OAuth 2.1) | claude.ai, Claude Desktop, any HTTP-capable client | add `https://mcp.pixfaro.com/mcp` — the client runs the OAuth flow, you sign in with your Pixfaro account |
 | **Local** (stdio, npm) | Claude Code, Cursor, Windsurf, config-file setups | `npx -y @pixfaro/mcp` with `PIXFARO_KEY` in env |
 
-Source: [github.com/pixfaro/mcp](https://github.com/pixfaro/mcp) — the client is
+Source: [github.com/dariaworks/mcp](https://github.com/dariaworks/mcp) — the client is
 intentionally small enough to read before you hand it a key.
 
 ## Setup — no terminal needed

@@ -92,6 +92,7 @@ re-rendered exactly.
 | `asset_not_found` | unknown, deleted, or not yours (404, never an existence oracle) |
 | `render_busy` | 429, renderer at capacity — retry; **not charged** |
 | `render_failed` | 502; refunded, and `"charged": false` says so |
+| `content_overflow` | 422; the slots were valid but the text does not fit **this size** at a legible type size — shorten it or use a taller size such as `4:5`. Refunded, `"charged": false` |
 
 ## POST /v1/assets
 
@@ -133,6 +134,46 @@ separately.
 |---|---|---|
 | `quote-card` | simple · $0.02 | `quote`, `name?`, `handle?`, `avatar?` |
 | `post-card` | simple · $0.02 | `text`, `name`, `handle?`, `platform?`, `date?`, `avatar?` |
+| `stat-card` | simple · $0.02 | `value`, `label`, `delta?`, `delta_direction?`, `context?`, `source?`, `name?`, `handle?`, `avatar?` |
+| `table-card` | simple · $0.02 | `title`, `columns`, `rows`, `highlight_row?`, `footnote?`, `source?`, `name?`, `handle?`, `avatar?` |
+| `checklist-card` | simple · $0.02 | `title`, `items`, `marker?`, `footer?`, `name?`, `handle?`, `avatar?` |
+| `event-card` | simple · $0.02 | `title`, `date`, `time?`, `place?`, `details?`, `cta?`, `image?`, `name?`, `handle?`, `avatar?` |
+
+### Data cards
+
+`stat-card`, `table-card`, `checklist-card` and `event-card` are for posts where
+the visual is the information — a rate, a table, a checklist, an event — and
+for businesses where AI imagery is often not an option. Type is the visual:
+the main block sizes itself to the room it has, and on `1:1` and `4:5` body text
+never goes below 28 px on a 1080-wide card, so it reads in a phone feed.
+
+Slots are plain strings; the structured ones have a fixed shape, and anything
+outside it is refused with the slot named — never padded or cut:
+
+| Slot | Shape |
+|---|---|
+| `stat-card.value` | the number itself, ≤ 16 characters: `"6.84%"`, `"$412K"`, `"14 days"` |
+| `stat-card.delta_direction` | `up`, `down` or `flat` — the arrow is drawn, not typed. Omitted: read from a leading `+`/`-` or `▲`/`▼` in `delta` |
+| `table-card.columns` | 2–4 headers separated by `\|`, ≤ 24 characters each |
+| `table-card.rows` | one row per line, cells separated by `\|`, as many cells as columns, ≤ 6 rows, ≤ 24 characters a cell |
+| `table-card.highlight_row` | `1` to the number of rows — that row is set in the accent |
+| `checklist-card.items` | 3–5 items, one per line, ≤ 90 characters each |
+| `checklist-card.marker` | `check` (default), `number` or `dot` |
+| `event-card.image` | an asset id, your own `/i/` URL or a data URI — a band on top of `1:1`/`4:5`, a column on the right of `16:9`/`og`. `"default"` is refused here |
+
+```bash
+curl https://api.pixfaro.com/v1/renders \
+  -H "Authorization: Bearer pf_live_…" -H "Content-Type: application/json" \
+  -d '{"template":"table-card","size":"4:5","style":"brand",
+       "slots":{"title":"Mortgage rates this week",
+                "columns":"Term | Rate | Change",
+                "rows":"30-year fixed | 6.84% | -0.12\n15-year fixed | 6.03% | -0.09",
+                "highlight_row":"1","source":"Source: Freddie Mac PMMS"}}'
+```
+
+Every legal value fits `1:1` and `4:5`. A wide size (`16:9`, `og`) has less
+height, so a table or checklist at its maximum can be refused there with
+`content_overflow` — the card is never shipped with rows cut off.
 
 More arrive with composition — an image slot you can fill with a generation in
 the same request.
